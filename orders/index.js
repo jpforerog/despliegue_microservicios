@@ -3,12 +3,13 @@ const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const axios = require('axios'); // 📌 Para comunicarse con otros microservicios
 const Order = require('./models/Order');
-require('dotenv').config();
 const app = express();
 const cors = require('cors');
+require('dotenv').config();
 
 app.use(express.json());
 app.use(cors());
+
 
 // Conexión a MongoDB
 const uri = process.env.MONGODB_URI;
@@ -49,7 +50,7 @@ app.post('/', authenticate, async (req, res) => {
 
         // Luego construye la ruta completa dinámicamente
         const userResponse = await fetch(`${baseUsersUrl}/${userId}`);
-        
+        console.log(`${baseUsersUrl}/${userId}`)
         if (!userResponse.data) {
             return res.status(400).json({ error: 'Invalid user' });
         }
