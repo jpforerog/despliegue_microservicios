@@ -43,7 +43,7 @@ app.post('/', authenticate, async (req, res) => {
 
         // 📌 Verificar que el usuario existe en el microservicio de usuarios
         const baseUsersUrl = process.env.USERS_URL;
-        if (!baseOrdersUrl) {
+        if (!baseUsersUrl) {
         throw new Error('❌ USERS_URL no está definida en el entorno');
         }
 
@@ -108,13 +108,13 @@ app.get('/', authenticate, async (req, res) => {
 
         // 📌 Obtener información del usuario
         // Lee la URL base desde la variable de entorno
-        const baseUsersUrl = process.env.USERS_URL;
-        if (!baseUsersUrl) {
+        const baseOrdersUrl = process.env.ORDERS_URL;
+        if (!baseOrdersUrl) {
         throw new Error('❌ ORDERS_URL no está definida en el entorno');
         }
 
         // Luego construye la ruta completa dinámicamente
-        const userResponses = await fetch(`${baseUsersUrl}/${req.userId}`);
+        const userResponses = await fetch(`${baseOrdersUrl}/${req.userId}`);
 
         // 📌 Agregar los datos del usuario a la orden
         const ordersWithUser = orders.map(order => ({
