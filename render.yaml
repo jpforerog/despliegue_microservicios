@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: gateway
+    env: node
+    rootDir: gateway
+    buildCommand: npm install
+    startCommand: npm start
+
+  - type: web
+    name: orders
+    env: node
+    rootDir: orders
+    buildCommand: npm install
+    startCommand: npm start
+
+  - type: web
+    name: products
+    env: node
+    rootDir: products
+    buildCommand: npm install
+    startCommand: npm start
+
+  - type: web
+    name: users
+    env: node
+    rootDir: users
+    buildCommand: npm install
+    startCommand: npm start
