@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const Product = require('./models/Product'); // Importar el modelo de producto
-
+require('dotenv').config();
 const app = express();
 const cors = require('cors');
 
@@ -10,11 +10,22 @@ app.use(express.json());
 app.use(cors());
 
 // Conexión a MongoDB
-mongoose.connect('mongodb://localhost:27017/products', { 
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-}).then(() => console.log("Connected to MongoDB Products"))
-  .catch(err => console.error("Error connecting to MongoDB:", err));
+const uri = process.env.MONGODB_URI;
+if (!uri) {
+  console.error('❌ MONGODB_URI no definido');
+  process.exit(1);
+}
+
+mongoose.connect(uri, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => console.log('✅ Conectado a MongoDB Atlas'))
+.catch(err => {
+  console.error('❌ Error al conectar MongoDB:', err);
+  process.exit(1);
+});
+
 
 // Middleware de autenticación con JWT
 const authenticate = (req, res, next) => {
@@ -70,5 +81,5 @@ app.get('/:id', async (req, res) => {
 // **Iniciar servidor en el puerto 4002**
 
 
-const port = process.env.PORT || 4002;
-app.listen(port, () => console.log('Product Service running on port 4002'));
+const port = process.env.PORT || 3002;
+app.listen(port, () => console.log(`Product Service running on port ${port}`));

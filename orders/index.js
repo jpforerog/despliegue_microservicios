@@ -3,17 +3,22 @@ const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const axios = require('axios'); // 📌 Para comunicarse con otros microservicios
 const Order = require('./models/Order');
-
+require('dotenv').config();
 const app = express();
 const cors = require('cors');
 
 app.use(express.json());
 app.use(cors());
 
-mongoose.connect('mongodb://localhost:27017/orders', { 
-    useNewUrlParser: true,
-    useUnifiedTopology: true 
-});
+// Conexión a MongoDB
+const uri = process.env.MONGODB_URI;
+if (!uri) {
+  console.error('🔴 Falta MONGODB_URI');
+  process.exit(1);
+}
+mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('✅ Conectado a MongoDB'))
+  .catch(err => console.error('❌ Error MongoDB:', err));
 
 // 📌 Middleware de autenticación
 const authenticate = (req, res, next) => {
@@ -37,7 +42,14 @@ app.post('/', authenticate, async (req, res) => {
         const { userId, products } = req.body;
 
         // 📌 Verificar que el usuario existe en el microservicio de usuarios
-        const userResponse = await axios.get(`http://localhost:4001/${userId}`);
+        const baseUsersUrl = process.env.USERS_URL;
+        if (!baseOrdersUrl) {
+        throw new Error('❌ USERS_URL no está definida en el entorno');
+        }
+
+        // Luego construye la ruta completa dinámicamente
+        const userResponse = await fetch(`${baseUsersUrl}/${userId}`);
+        
         if (!userResponse.data) {
             return res.status(400).json({ error: 'Invalid user' });
         }
@@ -45,7 +57,15 @@ app.post('/', authenticate, async (req, res) => {
         // 📌 Verificar que los productos existen en el microservicio de productos
         const productPromises = products.map(async (p) => {
             try {
-                const productResponse = await axios.get(`http://localhost:4002/${p.productId}`);
+                const baseProductsUrl = process.env.PRODUCTS_URL;
+                if (!baseProductsUrl) {
+                throw new Error('❌ PRODUCTS_URL no está definida en el entorno');
+                }
+
+                // Luego construye la ruta completa dinámicamente
+                const productResponse = await fetch(`${baseProductsUrl}/${p.productId}`);
+
+                
                 return productResponse.data ? { ...productResponse.data, quantity: p.quantity } : null;
             } catch (error) {
                 return null; // Si falla la consulta del producto, se marca como inválido
@@ -87,7 +107,14 @@ app.get('/', authenticate, async (req, res) => {
         const orders = await Order.find();
 
         // 📌 Obtener información del usuario
-        const userResponses = await axios.get(`http://localhost:4001/${req.userId}`);
+        // Lee la URL base desde la variable de entorno
+        const baseUsersUrl = process.env.USERS_URL;
+        if (!baseUsersUrl) {
+        throw new Error('❌ ORDERS_URL no está definida en el entorno');
+        }
+
+        // Luego construye la ruta completa dinámicamente
+        const userResponses = await fetch(`${baseUsersUrl}/${req.userId}`);
 
         // 📌 Agregar los datos del usuario a la orden
         const ordersWithUser = orders.map(order => ({
@@ -104,4 +131,4 @@ app.get('/', authenticate, async (req, res) => {
 
 const port = process.env.PORT || 3003;
 
-app.listen(port, () => console.log('Order Service running on port 4003'));
+app.listen(port, () => console.log(`Order Service running on port ${port}`));

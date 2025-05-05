@@ -1,7 +1,7 @@
 const express = require('express');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 const jwt = require('jsonwebtoken');
-
+require('dotenv').config();
 const app = express();
 const cors = require('cors');
 
@@ -14,4 +14,4 @@ app.use('/orders', createProxyMiddleware({ target: 'http://localhost:4003', chan
 
 const port = process.env.PORT || 3000; 
 
-app.listen(port, () => console.log('API Gateway running on port 4000'));
+app.listen(port, () => console.log(`API Gateway running on port 4000`));

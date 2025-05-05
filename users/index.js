@@ -5,11 +5,28 @@ const bcrypt = require('bcrypt');
 const User = require('./models/User');
 const app = express();
 const cors = require('cors');
+require('dotenv').config();
 
 app.use(express.json());
 app.use(cors());
 
-mongoose.connect('mongodb://localhost:27017/users', { useNewUrlParser: true, useUnifiedTopology: true });
+// lee la URI de la base de datos desde las env vars
+const uri = process.env.MONGODB_URI;
+if (!uri) {
+  console.error('❌ MONGODB_URI no definido');
+  process.exit(1);
+}
+
+mongoose.connect(uri, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => console.log('✅ Conectado a MongoDB Atlas'))
+.catch(err => {
+  console.error('❌ Error al conectar MongoDB:', err);
+  process.exit(1);
+});
+
 
 
 app.post('/register', async (req, res) => {
@@ -74,4 +91,4 @@ app.post('/nombreUsuario',async (req,res)=> {
 
 
 const port = process.env.PORT || 3001;
-app.listen(port, () => console.log('User Service running on port 4001'));
+app.listen(port, () => console.log(`User Service running on port ${port}`));
