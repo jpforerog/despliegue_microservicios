@@ -51,8 +51,14 @@ app.post('/', authenticate, async (req, res) => {
         // Luego construye la ruta completa dinámicamente
         const userResponse = await fetch(`${baseUsersUrl}/${userId}`);
         console.log(`${baseUsersUrl}/${userId}`)
-        if (!userResponse.data) {
-            return res.status(400).json({ error: 'Invalid user' });
+        if (!userResponse.ok) {
+            throw new Error(`Error al obtener el usuario: ${userResponse.statusText}`);
+        }
+    
+        const userData = await userResponse.json(); // Parsea el JSON
+    
+        if (!userData) { // Valida los datos obtenidos
+        return res.status(400).json({ error: 'Invalid user' });
         }
 
         // 📌 Verificar que los productos existen en el microservicio de productos
