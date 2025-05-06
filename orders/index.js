@@ -50,7 +50,7 @@ app.post('/', authenticate, async (req, res) => {
 
         // Luego construye la ruta completa dinámicamente
         const userResponse = await fetch(`${baseUsersUrl}/${userId}`);
-        console.log(`${baseUsersUrl}/${userId}`)
+        
         if (!userResponse.ok) {
             throw new Error(`Error al obtener el usuario: ${userResponse.statusText}`);
         }
@@ -72,8 +72,8 @@ app.post('/', authenticate, async (req, res) => {
                 // Luego construye la ruta completa dinámicamente
                 const productResponse = await fetch(`${baseProductsUrl}/${p.productId}`);
 
-                
-                return productResponse.data ? { ...productResponse.data, quantity: p.quantity } : null;
+                const producData = await productResponse.json();
+                return producData ? { ...productResponse.data, quantity: p.quantity } : null;
             } catch (error) {
                 return null; // Si falla la consulta del producto, se marca como inválido
             }
