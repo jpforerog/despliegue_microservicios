@@ -71,9 +71,10 @@ app.post('/', authenticate, async (req, res) => {
 
                 // Luego construye la ruta completa dinámicamente
                 const productResponse = await fetch(`${baseProductsUrl}/${p.productId}`);
-
+                console.log(`${baseProductsUrl}/${p.productId}`)
                 const producData = await productResponse.json();
-                return producData ? { ...productResponse.data, quantity: p.quantity } : null;
+                console.log(producData)
+                return producData ? { ...producData, quantity: p.quantity } : null;
             } catch (error) {
                 return null; // Si falla la consulta del producto, se marca como inválido
             }
